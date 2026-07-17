@@ -3,9 +3,9 @@ import { readFileSync } from 'node:fs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
-const RAW_URL =
-  'https://raw.githubusercontent.com/Ginger-Automotive/dotdev-calendar/main/dist/dotdev-calendar.user.js';
-
+// No @updateURL/@downloadURL: this repo is private, so raw.githubusercontent.com
+// 404s and Violentmonkey/Tampermonkey cannot auto-update. Bump package.json
+// "version" on each release so a manual reinstall/replace is detected as newer.
 const banner = `// ==UserScript==
 // @name         DotDev 2026 Calendar View
 // @namespace    https://github.com/Ginger-Automotive/dotdev-calendar
@@ -17,8 +17,6 @@ const banner = `// ==UserScript==
 // @run-at       document-idle
 // @noframes
 // @grant        none
-// @downloadURL  ${RAW_URL}
-// @updateURL    ${RAW_URL}
 // ==/UserScript==`;
 
 await build({
