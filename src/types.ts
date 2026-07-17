@@ -19,7 +19,7 @@ export type ParsedSession = {
   endMin: number;
   /** raw time text as shown on the site, e.g. "10:15am - 10:45am" or "All day" */
   timeText: string;
-  /** true for sessions without a time range (product booths) or very long spans */
+  /** true for sessions without a time range (product booths marked "All day") */
   allDay: boolean;
   featured: boolean;
   /** true when the session is currently on the visitor's My List */

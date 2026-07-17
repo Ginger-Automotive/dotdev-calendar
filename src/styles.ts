@@ -62,7 +62,10 @@ export const CSS = `
   font-style: normal;
 }
 .ddc-legend .ddc-key-listed i { background: var(--color-terminal, #031e1d); }
-.ddc-legend .ddc-key-clash i { background: #ff3b3b; border-color: #ff3b3b; }
+.ddc-legend .ddc-key-clash i {
+  background: var(--ddc-clash, #ff2d55);
+  border-color: var(--ddc-clash, #ff2d55);
+}
 
 .ddc-allday {
   display: flex;
@@ -131,8 +134,10 @@ export const CSS = `
   color: var(--color-grey, #d3d3d3);
 }
 .ddc-block.ddc-clash {
-  border: 2px solid #ff3b3b;
-  box-shadow: 0 0 0 1px #ff3b3b;
+  border: 2px solid var(--ddc-clash, #ff2d55);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--ddc-clash, #ff2d55) 40%, #fff),
+    inset 0 0 0 1px var(--ddc-clash, #ff2d55);
 }
 .ddc-block.ddc-featured:not(.ddc-listed) { background: var(--page-bg-color, #8fd5f1); }
 
@@ -168,7 +173,7 @@ export const CSS = `
 .ddc-block.ddc-short .ddc-block-loc { display: none; }
 
 .ddc-clash-note {
-  border: 2px solid #ff3b3b;
+  border: 2px solid var(--ddc-clash, #ff2d55);
   background: var(--color-grey, #d3d3d3);
   font-family: var(--font-mono, 'IBM Plex Mono', monospace);
   font-size: 0.75rem;

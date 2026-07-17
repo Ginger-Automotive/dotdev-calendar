@@ -1,8 +1,6 @@
+import { resolveClashColor } from './color';
 import { formatMinutes, layoutDay, timeBounds } from './layout';
 import type { ParsedSession, PositionedSession } from './types';
-
-/** Sessions at least this long (booths) render as all-day chips, not blocks. */
-const ALL_DAY_MIN = 300;
 
 const TYPE_LABELS: Record<string, string> = {
   main_stage: 'Main Stage',
@@ -73,9 +71,14 @@ export function renderTimeline(
   onOpen: (session: ParsedSession) => void,
 ): HTMLElement {
   const root = el('div', 'ddc-day');
+  // Contrast the clash accent with DotDev's rotating page background (e.g.
+  // violet on orange, magenta-red on sky/mint) so outlines stay readable.
+  root.style.setProperty('--ddc-clash', resolveClashColor());
 
-  const allDay = sessions.filter((s) => s.allDay || s.endMin - s.startMin >= ALL_DAY_MIN);
-  const timed = sessions.filter((s) => !s.allDay && s.endMin - s.startMin < ALL_DAY_MIN);
+  // Only true "All day" sessions (product booths) become chips. Long timed
+  // events like Block Party (5–10pm) stay on the timeline.
+  const allDay = sessions.filter((s) => s.allDay);
+  const timed = sessions.filter((s) => !s.allDay);
 
   if (sessions.length === 0) {
     root.append(el('p', 'ddc-empty', 'Nothing to show for this day'));

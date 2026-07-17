@@ -125,7 +125,10 @@
   font-style: normal;
 }
 .ddc-legend .ddc-key-listed i { background: var(--color-terminal, #031e1d); }
-.ddc-legend .ddc-key-clash i { background: #ff3b3b; border-color: #ff3b3b; }
+.ddc-legend .ddc-key-clash i {
+  background: var(--ddc-clash, #ff2d55);
+  border-color: var(--ddc-clash, #ff2d55);
+}
 
 .ddc-allday {
   display: flex;
@@ -194,8 +197,10 @@
   color: var(--color-grey, #d3d3d3);
 }
 .ddc-block.ddc-clash {
-  border: 2px solid #ff3b3b;
-  box-shadow: 0 0 0 1px #ff3b3b;
+  border: 2px solid var(--ddc-clash, #ff2d55);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--ddc-clash, #ff2d55) 40%, #fff),
+    inset 0 0 0 1px var(--ddc-clash, #ff2d55);
 }
 .ddc-block.ddc-featured:not(.ddc-listed) { background: var(--page-bg-color, #8fd5f1); }
 
@@ -231,7 +236,7 @@
 .ddc-block.ddc-short .ddc-block-loc { display: none; }
 
 .ddc-clash-note {
-  border: 2px solid #ff3b3b;
+  border: 2px solid var(--ddc-clash, #ff2d55);
   background: var(--color-grey, #d3d3d3);
   font-family: var(--font-mono, 'IBM Plex Mono', monospace);
   font-size: 0.75rem;
@@ -341,6 +346,61 @@
 }
 `;
 
+  // src/color.ts
+  function parseCssColor(raw) {
+    const value = raw.trim();
+    const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(value);
+    if (hex?.[1]) {
+      const h = hex[1];
+      if (h.length === 3) {
+        return {
+          r: Number.parseInt(h[0] + h[0], 16),
+          g: Number.parseInt(h[1] + h[1], 16),
+          b: Number.parseInt(h[2] + h[2], 16)
+        };
+      }
+      return {
+        r: Number.parseInt(h.slice(0, 2), 16),
+        g: Number.parseInt(h.slice(2, 4), 16),
+        b: Number.parseInt(h.slice(4, 6), 16)
+      };
+    }
+    const rgb = /^rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/i.exec(value);
+    if (rgb) {
+      return { r: Number(rgb[1]), g: Number(rgb[2]), b: Number(rgb[3]) };
+    }
+    return null;
+  }
+  function rgbToHsl({ r, g, b }) {
+    const rn = r / 255;
+    const gn = g / 255;
+    const bn = b / 255;
+    const max = Math.max(rn, gn, bn);
+    const min = Math.min(rn, gn, bn);
+    const l = (max + min) / 2;
+    if (max === min) return { h: 0, s: 0, l };
+    const d = max - min;
+    const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    let h = 0;
+    if (max === rn) h = ((gn - bn) / d + (gn < bn ? 6 : 0)) / 6;
+    else if (max === gn) h = ((bn - rn) / d + 2) / 6;
+    else h = ((rn - gn) / d + 4) / 6;
+    return { h: h * 360, s, l };
+  }
+  function clashColorForBackground(bg) {
+    const rgb = parseCssColor(bg);
+    if (!rgb) return "#4D1FFF";
+    const { h, s } = rgbToHsl(rgb);
+    const warm = s > 0.25 && (h <= 55 || h >= 330);
+    return warm ? "#4D1FFF" : "#FF2D55";
+  }
+  function resolveClashColor(doc = document) {
+    const root = doc.documentElement;
+    const fromRoot = getComputedStyle(root).getPropertyValue("--page-bg-color").trim();
+    const fromBody = doc.body ? getComputedStyle(doc.body).getPropertyValue("--page-bg-color").trim() : "";
+    return clashColorForBackground(fromRoot || fromBody || "#8fd5f1");
+  }
+
   // src/layout.ts
   function overlaps(a, b) {
     return a.startMin < b.endMin && b.startMin < a.endMin;
@@ -405,7 +465,6 @@
   }
 
   // src/timeline.ts
-  var ALL_DAY_MIN = 300;
   var TYPE_LABELS = {
     main_stage: "Main Stage",
     workshop: "Workshop",
@@ -455,8 +514,9 @@
   }
   function renderTimeline(sessions, onOpen) {
     const root = el("div", "ddc-day");
-    const allDay = sessions.filter((s) => s.allDay || s.endMin - s.startMin >= ALL_DAY_MIN);
-    const timed = sessions.filter((s) => !s.allDay && s.endMin - s.startMin < ALL_DAY_MIN);
+    root.style.setProperty("--ddc-clash", resolveClashColor());
+    const allDay = sessions.filter((s) => s.allDay);
+    const timed = sessions.filter((s) => !s.allDay);
     if (sessions.length === 0) {
       root.append(el("p", "ddc-empty", "Nothing to show for this day"));
       return root;

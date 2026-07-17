@@ -5,7 +5,7 @@ A userscript that adds a **toggleable, clash-aware calendar view** to the [DotDe
 - [The lineup](https://dotdev.shopify.com/pages/sessions) (`/pages/sessions`)
 - [My list](https://dotdev.shopify.com/pages/my-list) (`/pages/my-list`)
 
-A **List view / Calendar view** toggle appears under the Day 1 / Day 2 tabs. Calendar view lays sessions out on a vertical timeline with side-by-side lanes for overlaps. Sessions on your My List are filled dark; any two listed sessions that overlap get a red **clash** outline and a banner. Product booths render as all-day chips. Tapping a session opens its full details (description, speakers, prerequisites) with an Add/Remove my-list button that uses the site's own wishlist mechanism, so login state and persistence behave exactly like the native pages.
+A **List view / Calendar view** toggle appears under the Day 1 / Day 2 tabs. Calendar view lays sessions out on a vertical timeline with side-by-side lanes for overlaps. Sessions on your My List are filled dark; any two listed sessions that overlap get a high-contrast **clash** outline (violet on warm page colors, magenta-red on cool ones) and a banner. Product booths render as all-day chips; long timed events like Block Party stay on the timeline. Tapping a session opens its full details (description, speakers, prerequisites) with an Add/Remove my-list button that uses the site's own wishlist mechanism, so login state and persistence behave exactly like the native pages.
 
 The site's Day tabs, topic filters, and my-list filtering all keep working — the calendar re-renders from whatever the native filters leave visible. Styling reuses the DotDev theme's own CSS variables (colors rotate per visit, like the site).
 

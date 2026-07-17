@@ -97,6 +97,26 @@ async function boot(url) {
   assert.equal(listed.length, 2, `expected 2 listed blocks, got ${listed.length}`);
   assert.ok(doc.querySelector('.ddc-clash-note'), 'clash banner shown');
 
+  // Fixture page bg is sky (#8FD5F1) → cool → magenta-red clash accent.
+  const day = doc.querySelector('.ddc-day');
+  assert.ok(day, 'day root present');
+  assert.equal(
+    day.style.getPropertyValue('--ddc-clash').trim().toLowerCase(),
+    '#ff2d55',
+    'cool page bg should pick magenta-red clash accent',
+  );
+
+  // Warm (orange) page bg → violet clash accent.
+  doc.documentElement.style.setProperty('--page-bg-color', '#FF8A1D');
+  doc.querySelectorAll('.ddc-toggle')[0].click();
+  doc.querySelectorAll('.ddc-toggle')[1].click();
+  await sleep(150);
+  assert.equal(
+    doc.querySelector('.ddc-day').style.getPropertyValue('--ddc-clash').trim().toLowerCase(),
+    '#4d1fff',
+    'warm page bg should pick violet clash accent',
+  );
+
   dom.window.close();
   console.log('clash detection: ok');
 }
@@ -121,6 +141,21 @@ async function boot(url) {
   const day2Count = doc.querySelectorAll('.ddc-block').length;
   assert.ok(day2Count > 5, `expected day-2 blocks, got ${day2Count}`);
   assert.notEqual(day1Count, day2Count, 'day switch changes the rendered set');
+
+  // Block Party is 5:00pm–10:00pm — a long timed event, not an all-day booth.
+  // It must appear on the timeline, not as a chip at the top.
+  const blockPartyChip = [...doc.querySelectorAll('.ddc-allday-chip')].find((c) =>
+    c.textContent?.includes('Block Party'),
+  );
+  assert.equal(blockPartyChip, undefined, 'Block Party must not be an all-day chip');
+  const blockParty = [...doc.querySelectorAll('.ddc-block')].find((b) =>
+    b.querySelector('.ddc-block-title')?.textContent === 'Block Party',
+  );
+  assert.ok(blockParty, 'Block Party appears as a timeline block on day 2');
+  assert.ok(
+    parseFloat(blockParty.style.height) > 100,
+    `Block Party block should span several hours, height=${blockParty.style.height}`,
+  );
 
   dom.window.close();
   console.log(`day switching: ok (day1=${day1Count}, day2=${day2Count})`);
