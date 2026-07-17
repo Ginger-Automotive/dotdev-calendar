@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DotDev 2026 Calendar View
 // @namespace    https://github.com/Ginger-Automotive/dotdev-calendar
-// @version      0.2.0
+// @version      0.2.1
 // @description  Adds a toggleable clash-aware calendar/timeline view to the DotDev 2026 sessions and my-list pages
 // @author       dotdev-calendar
 // @match        https://dotdev.shopify.com/pages/sessions*
@@ -9,6 +9,8 @@
 // @run-at       document-idle
 // @noframes
 // @grant        none
+// @downloadURL  https://raw.githubusercontent.com/Ginger-Automotive/dotdev-calendar/main/dist/dotdev-calendar.user.js
+// @updateURL    https://raw.githubusercontent.com/Ginger-Automotive/dotdev-calendar/main/dist/dotdev-calendar.user.js
 // ==/UserScript==
 "use strict";
 (() => {
